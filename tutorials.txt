@@ -1,0 +1,21 @@
+docker-compose up -d --build
+
+docker ps
+
+docker logs flask_app
+docker logs postgres_db
+docker logs nginx_proxy
+
+# Check Flask API
+curl http://localhost:5000/
+
+# Get Users from PostgreSQL
+curl http://localhost:5000/users
+
+docker-compose down
+
+
+
+psql -U user -d mydatabase
+
+select * from users;
