@@ -1,0 +1,36 @@
+# Flask Backend
+docker build -t your-dockerhub-user/flask-app ./backend
+
+# Push Flask Image
+docker push your-dockerhub-user/flask-app
+
+# Nginx Image (if modified)
+docker build -t your-dockerhub-user/nginx-proxy ./nginx
+docker push your-dockerhub-user/nginx-proxy
+
+
+Step 1: Apply PostgreSQL
+kubectl apply -f k8s/postgres-pvc.yaml
+kubectl apply -f k8s/db-deployment.yaml
+kubectl apply -f k8s/db-service.yaml
+
+Step 2: Deploy Flask Backend
+kubectl apply -f k8s/backend-deployment.yaml
+kubectl apply -f k8s/backend-service.yaml
+
+Step 3: Deploy Nginx
+kubectl apply -f k8s/nginx-configmap.yaml
+kubectl apply -f k8s/nginx-deployment.yaml
+kubectl apply -f k8s/nginx-service.yaml
+
+
+kubectl get pods
+kubectl get svc
+
+
+# Replace with LoadBalancer IP
+curl http://<EXTERNAL-IP>/
+curl http://<EXTERNAL-IP>/users
+
+
+kubectl scale deployment flask-backend --replicas=3

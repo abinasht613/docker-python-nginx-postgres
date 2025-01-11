@@ -12,6 +12,8 @@ curl http://localhost:5000/
 # Get Users from PostgreSQL
 curl http://localhost:5000/users
 
+docker-compose up --scale backend=3 -d
+
 docker-compose down
 
 
