@@ -1,18 +1,24 @@
-version: "3.8"
+#version: "3.8" #  specify docker-compose version  
 
-services:
+services:  
   backend:
     build: ./backend
     container_name: flask_app
     ports:
-      - "5000:5000"
+      - "5000:5000"     # expose the port to the host machine
     depends_on:
-      - db
+      db:                           # wait for the db service to be ready
+        condition: service_healthy  # wait for the db service to be healthy
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_HOST: db
+    networks:
+      - app_network
+    restart: unless-stopped         # containers restart automatically if they fail unless it is stopped
+    # volumes:
+    # - ./backend:/app  # mount the local directory(backend) to the container directory(app), For Development
 
   db:
     image: postgres:13
@@ -22,20 +28,44 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data    # persist data even after the container is stopped
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # run the init.sql script to create the database
     ports:
-      - "5432:5432"
+      - "5432:5432"     # expose the port to the host machine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"] # check if the db is ready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network         # connect the db to the app network
+    restart: unless-stopped # containers restart automatically if they fail unless it is stopped
 
   nginx:
     image: nginx:latest
     container_name: nginx_proxy
     ports:
-      - "80:80"
+      - "81:80"
     depends_on:
       - backend
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro   # use custom nginx configuration
+      - ./backend/static:/usr/share/nginx/html/static # serve static files
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend-react
+    container_name: react_app
+    ports:
+      - "3000:80" # expose the port to the host machine
+    networks:
+      - app_network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  app_network:

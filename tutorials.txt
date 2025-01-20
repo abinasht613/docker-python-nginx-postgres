@@ -1,4 +1,8 @@
-docker-compose up -d --build
+docker-compose up -d --build        #build & then run
+docker-compose up --scale backend=3 -d
+#if code is updated
+docker-compose build backend
+docker-compose down -v  # Remove containers and volumes
 
 docker ps
 
@@ -12,12 +16,17 @@ curl http://localhost:5000/
 # Get Users from PostgreSQL
 curl http://localhost:5000/users
 
-docker-compose up --scale backend=3 -d
-
-docker-compose down
 
 
 
+
+docker exec -it <container_id> bash  
 psql -U user -d mydatabase
 
 select * from users;
+
+insert into users(id,name) values(4,'Monty');
+
+
+
+
