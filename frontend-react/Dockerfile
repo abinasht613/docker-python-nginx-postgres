@@ -11,6 +11,12 @@ RUN npm install
 # Copy app source and build it 
 COPY . .    
 #   Copy everything from the current directory to the /app directory in the container
+
+
+ARG REACT_APP_API_URL  # Accept the environment variable
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+
 RUN npm run build
 
 # Serve the app with nginx

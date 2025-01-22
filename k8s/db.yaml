@@ -25,12 +25,18 @@ spec:
           ports:
             - containerPort: 5432
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: postgres-storage
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data  # Persistent storage for database
+            - name: sql-volume
+              mountPath: /docker-entrypoint-initdb.d  # PostgreSQL will execute SQL scripts from this directory
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
-            claimName: postgres-pvc
+            claimName: postgres-pvc  # Ensure this PVC is created beforehand
+        - name: sql-volume
+          configMap:
+            name: db-init-sql  # The name of the ConfigMap holding init.sql
+
 ---
 apiVersion: v1
 kind: Service
@@ -44,3 +50,20 @@ spec:
       port: 5432
       targetPort: 5432
   clusterIP: None  # Internal service for backend connection
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-sql
+data:
+  init.sql: |
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        email VARCHAR(100) NOT NULL
+    );
+    
+    INSERT INTO users (username, email) VALUES
+    ('john_doe', 'john@example.com'),
+    ('jane_doe', 'jane@example.com');

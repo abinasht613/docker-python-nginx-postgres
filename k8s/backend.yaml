@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: flask-backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: your-dockerhub-user/flask-app
+          image: abinasht613/flask-app:01
           ports:
             - containerPort: 5000
           env:
@@ -39,3 +39,4 @@ spec:
       port: 5000
       targetPort: 5000
   type: ClusterIP
+

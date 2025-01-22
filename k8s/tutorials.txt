@@ -1,16 +1,22 @@
 # Flask Backend
-docker build -t your-dockerhub-user/flask-app ./backend
+docker build -t abinasht613/flask-app:01 ./backend  # -t tag
+
+
+docker build -t abinasht613/react-app:01 --build-arg REACT_APP_API_URL=http://flask-backend/api ./frontend-react/
+
 
 # Push Flask Image
-docker push your-dockerhub-user/flask-app
+docker push abinasht613/flask-app:01
 
 # Nginx Image (if modified)
-docker build -t your-dockerhub-user/nginx-proxy ./nginx
-docker push your-dockerhub-user/nginx-proxy
+docker build -t abinasht613/nginx-proxy ./nginx
+docker push abinasht613/nginx-proxy
 
+#database tabel create and insert data
+kubectl create configmap db-init-sql --from-file=../db/init.sql
 
 Step 1: Apply PostgreSQL
-kubectl apply -f k8s/postgres-pvc.yaml
+kubectl apply -f k8s/postgres-pvc.yaml          # -f file
 kubectl apply -f k8s/db-deployment.yaml
 kubectl apply -f k8s/db-service.yaml
 
@@ -23,14 +29,22 @@ kubectl apply -f k8s/nginx-configmap.yaml
 kubectl apply -f k8s/nginx-deployment.yaml
 kubectl apply -f k8s/nginx-service.yaml
 
+kubectl delete -f deployment.yaml
 
 kubectl get pods
 kubectl get svc
 
 
-# Replace with LoadBalancer IP
+# Replace with LoadBalancer IP (cloud)
 curl http://<EXTERNAL-IP>/
 curl http://<EXTERNAL-IP>/users
 
+#minikube
+minikube ip
 
 kubectl scale deployment flask-backend --replicas=3
+
+#multiple containers inside a pod
+kubectl exec -it <your-pod-name> -c <container-name> -- /bin/sh
+
+kubectl logs -f <your-pod-name>     #real time stats

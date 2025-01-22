@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-var url="http://localhost:5000";
+const apiUrl = window.env?.REACT_APP_API_URL || process.env.REACT_APP_API_URL;
+// var url="http://localhost:5000";
 function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch(url+"/users") 
+    fetch(`${apiUrl}/users`)
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error(err));
