@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: react-frontend
-          image: abinasht613/react-app:08
+          image: abinasht613/react-app:12
           ports:
             - containerPort: 80
           env:

@@ -26,6 +26,7 @@ def home():
 
 @app.route("/users")
 def get_users():
+    print("GET /users")
     conn = connect_db()
     cur = conn.cursor()
     cur.execute("SELECT * FROM users;")
@@ -34,6 +35,12 @@ def get_users():
     conn.close()
     # return render_template("users.html", users=users) # return template
     return jsonify(users)                             # return json
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"message": "Route not found:404"})
+    #return "Route not found", 404
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

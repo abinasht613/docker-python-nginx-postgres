@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: app-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
     - host: myapp.local
@@ -15,9 +15,9 @@ spec:
               service:
                 name: react-frontend-service
                 port:
-                  number: 81
-          - path: /api
-            pathType: Prefix
+                  number: 80
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: backend-service

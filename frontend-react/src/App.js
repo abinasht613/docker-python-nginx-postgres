@@ -1,15 +1,29 @@
 import React, { useEffect, useState } from "react";
 
-const apiUrl = window.env?.REACT_APP_API_URL || process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL;
+//const apiUrl = window.env?.REACT_APP_API_URL || process.env.REACT_APP_API_URL;
 // var url="http://localhost:5000";
 function App() {
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
-    fetch(`${apiUrl}/users`)
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error(err));
+    fetch(`${API_URL}/users`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -22,10 +36,16 @@ function App() {
               <h3 className="mb-0">Registered Users</h3>
             </div>
             <ul className="list-group list-group-flush">
-              {users.length > 0 ? (
+              {loading ? (
+                <li className="list-group-item text-center">Loading...</li>
+              ) : error ? (
+                <li className="list-group-item text-center text-danger">
+                  Error: {error}
+                </li>
+              ) : users.length > 0 ? (
                 users.map((user, index) => (
                   <li key={index} className="list-group-item">
-                    {user[1]}
+                    {user.username || user[1]} {/* Safely handle user data */}
                   </li>
                 ))
               ) : (

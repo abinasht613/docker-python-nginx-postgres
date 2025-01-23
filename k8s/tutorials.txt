@@ -2,6 +2,7 @@
 docker build -t abinasht613/flask-app:01 ./backend  # -t tag
 
 
+docker build -t abinasht613/react-app:01 ./frontend-react/
 docker build -t abinasht613/react-app:01 --build-arg REACT_APP_API_URL=http://flask-backend/api ./frontend-react/
 
 
@@ -48,3 +49,11 @@ kubectl scale deployment flask-backend --replicas=3
 kubectl exec -it <your-pod-name> -c <container-name> -- /bin/sh
 
 kubectl logs -f <your-pod-name>     #real time stats
+
+#Ingress
+kubectl get pods -n ingress-nginx
+minikube addons enable ingress
+kubectl describe ingress app-ingress
+minikube tunnel &    #This will expose the Ingress resource to your local machine.
+kubectl logs -n ingress-nginx -f <ingress-nginx-controller-pod-name> | grep 'GET\|POST\|HTTP'
+
